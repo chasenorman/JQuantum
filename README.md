@@ -35,4 +35,4 @@ From there, you can call gates on these through the `QuantumGate` class
 Or you can use preset functions and subroutines that are in the `QuantumFunction` class
 `QFT(a) //applies the quantum fourier transform`
 
-All of the classes given come with extensive documentation, so don't forget to take a look at it, and to see the inner workings of the quantum functions. I worked hard on them, after all.
+All of the classes given come with extensive documentation, and I have a javadoc included, so don't forget to take a look at it, and to see the inner workings of the quantum functions. I worked hard on them, after all.
