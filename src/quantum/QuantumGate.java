@@ -12,8 +12,8 @@ public class QuantumGate implements Consumer<Qubit[]> {
      * the Hadamard gate
      *
      * <p>
-     *     This gate transforms the |0⟩ basis state into an equal superposition of |0⟩ and |1⟩, while transforming the
-     *     |1⟩ basis state into the same superposition, except with the opposite phase on the |1⟩.
+     *     This gate transforms the |0&gt; basis state into an equal superposition of |0&gt; and |1&gt;, while transforming the
+     *     |1&gt; basis state into the same superposition, except with the opposite phase on the |1&gt;.
      * </p>
      */
     public static final QuantumGate H = new QuantumGate(
@@ -27,7 +27,7 @@ public class QuantumGate implements Consumer<Qubit[]> {
      * the Pauli-X gate
      *
      * <p>
-     *     Acts as a NOT gate on a single Qubit, transforming |0⟩ to |1⟩ and vice versa.
+     *     Acts as a NOT gate on a single Qubit, transforming |0&gt; to |1&gt; and vice versa.
      * </p>
      */
     public static final QuantumGate X = new QuantumGate(
@@ -41,7 +41,7 @@ public class QuantumGate implements Consumer<Qubit[]> {
      * the Pauli-Y gate
      *
      * <p>
-     *     Represents a π radian rotation about the Y-axis
+     *     Represents a pi radian rotation about the Y-axis
      * </p>
      */
     public static final QuantumGate Y = new QuantumGate(
@@ -55,7 +55,7 @@ public class QuantumGate implements Consumer<Qubit[]> {
      * the Pauli-Z gate
      *
      * <p>
-     *     Represents a π radian phase shift in a single Qubit.
+     *     Represents a pi radian phase shift in a single Qubit.
      * </p>
      */
     public static final QuantumGate Z = R(1);
@@ -77,7 +77,7 @@ public class QuantumGate implements Consumer<Qubit[]> {
     );
 
     /**
-     * the √SWAP gae
+     * the sqrt(SWAP) gae
      *
      * <p>
      *     When performed twice, this gate is equivalent to a swap, therefore this gate is the equivalent of the square root of a swap.
@@ -96,13 +96,13 @@ public class QuantumGate implements Consumer<Qubit[]> {
      * the Controlled-NOT gate
      *
      * <p>
-     *    Operates on 2 Qubits, performing NOT on the first iff the second is |1⟩
+     *    Operates on 2 Qubits, performing NOT on the first iff the second is |1&gt;
      * </p>
      */
     public static final QuantumGate CNOT = C(X);
 
     /**
-     * the √¬ gate
+     * the sqrt(¬) gate
      *
      * <p>
      *     When performed twice, this gate is equivalent to a NOT (X) gate, so it considered the square root of the not gate.
@@ -118,14 +118,13 @@ public class QuantumGate implements Consumer<Qubit[]> {
     private Complex[][] matrix;
     public int size;
 
-
-    //TODO be a bit more restrictive with what can be a gate.
     public QuantumGate(Complex[][] matrix){
         if(((matrix.length & (matrix.length - 1)) != 0) || matrix.length == 0 || matrix.length != matrix[0].length)
             throw new IllegalArgumentException("Matrix not of proper dimensions");
 
         size = (int)Math.round(Math.log(matrix.length)/Math.log(2));
         this.matrix = matrix;
+        assert isUnitary();
     }
 
     /**
@@ -150,7 +149,7 @@ public class QuantumGate implements Consumer<Qubit[]> {
     }
 
     /**
-     * Creates a phase-shift gate, on one Qubit, of order k, such that the shift is determined by 2π/(2^k) radians. R(1) ≡ Z
+     * Creates a phase-shift gate, on one Qubit, of order k, such that the shift is determined by 2pi/(2^k) radians. R(1) = Z
      * @param k the order of the phase-shift gate to be created
      * @return a {@code QuantumGate} R_k
      */
@@ -182,7 +181,6 @@ public class QuantumGate implements Consumer<Qubit[]> {
     }
 
     /**
-     *
      * @return a {@code String} representation of the gate matrix
      */
     public String toString(){
@@ -197,7 +195,7 @@ public class QuantumGate implements Consumer<Qubit[]> {
     }
 
     /**
-     * Creates an inverse gate U^†, that when applied before or after the gate will result in the identity matrix. Because the matrices in
+     * Creates an inverse gate, that when applied before or after the gate will result in the identity matrix. Because the matrices in
      * quantum gates are unitary, this is equivalent to the conjugate transpose.
      * @return The inverse of this gate.
      */
@@ -218,7 +216,7 @@ public class QuantumGate implements Consumer<Qubit[]> {
             throw new IllegalArgumentException("Invalid number of operands");
 
         for(int x = 1; x < qubits.length; x++)
-            QuantumState.combine(qubits[0].delegate,qubits[x].delegate);
+            QuantumState.entangle(qubits[0].delegate,qubits[x].delegate);
 
         qubits[0].delegate.apply(this,qubits);
     }
@@ -227,12 +225,32 @@ public class QuantumGate implements Consumer<Qubit[]> {
      * Applies this quantum gate to the qubits of a quantum register
      * @param qr quantum register for which this gate will be applied
      */
-    public void accept(QuantumRegister qr){
+    public void accept(QubitRegister qr){
         if(qr.qubits.length != size)
             throw new IllegalArgumentException("Invalid number of operands");
 
-        qr.delegates().forEach(qs->QuantumState.combine(qr.qubits[0].delegate,qs));
+        qr.delegates().forEach(qs->QuantumState.entangle(qr.qubits[0].delegate,qs));
 
         qr.qubits[0].delegate.apply(this,qr.qubits);
+    }
+
+    /**
+     * Determines whether this {@code QuantumGate} is unitary. This is a requirement of being a proper QuantumGate.
+     * This is determined by checking if, when multiplied by its inverse, this gate is equivalent to the identity matrix.
+     * @return whether this {@code QuantumGate} is unitary or not.
+     */
+    public boolean isUnitary(){
+        QuantumGate inverse = inverse();
+        Complex[] row = new Complex[1<<size];
+
+        for(int x = 0; x < 1<<size; x++)
+            for(int y = 0; y < 1<<size; y++){
+                for(int z = 0; z < 1<<size; z++)
+                    row[z] = matrix[x][z].multiply(inverse.matrix[z][y]);
+                if(!sum(row).equals( x==y ? ONE : ZERO))
+                    return false;
+            }
+
+        return true;
     }
 }

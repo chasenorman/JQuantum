@@ -9,8 +9,7 @@ import static quantum.BitUtils.*;
  * Represents the state of one or many entangled qubits. Carries the coefficients of all states possible, and performs operations on them.
  * Altogether, this class performs all of the mathematics behind the quantum programming, and should be inaccessible through normal means.
  */
-public class QuantumState {
-    //TODO thread safety?
+class QuantumState {
     /**contains the coefficients of all possible states from |0⟩⊗n to |1⟩⊗n*/
     private final Complex[] state;
     /**contains all of the qubits represented by this state*/
@@ -36,8 +35,7 @@ public class QuantumState {
         qubits = new Qubit[]{qubit};
     }
 
-    //TODO maybe dont destroy both of them.
-    static void combine(QuantumState first, QuantumState second){
+    static synchronized void entangle(QuantumState first, QuantumState second){
         if(first == second)
             return;
 
@@ -61,7 +59,7 @@ public class QuantumState {
      * @param q an array of qubits to be measured
      * @return a mapping of the successfully measured qubits and their respective basis
      */
-    Map<Qubit,Boolean> measure(Qubit... q) {
+    synchronized Map<Qubit,Boolean> measure(Qubit... q) {
         Map<Qubit, Boolean> result = sample(q);
 
         QuantumState mainState = new QuantumState(qubits.length-result.size());
@@ -98,7 +96,7 @@ public class QuantumState {
      * @param qubits qubits to be sampled
      * @return a mapping of all qubits that are within this state, to a possible basis state.
      */
-    Map<Qubit,Boolean> sample(Qubit... qubits){
+     Map<Qubit,Boolean> sample(Qubit... qubits){
         Map<Qubit, Boolean> result = new HashMap<>();
 
         double r = Math.random();
@@ -119,7 +117,7 @@ public class QuantumState {
      * @param gate gate to be applied
      * @param operands an array of qubits that are within the {@code QuantumState}
      */
-    void apply(QuantumGate gate, Qubit... operands) {
+    synchronized void apply(QuantumGate gate, Qubit... operands) {
         //create the bitMap array, an array with the index of bits such that the operands are the least significant
         int[] map = new int[qubits.length];
         int operandBits = 0;
@@ -151,7 +149,7 @@ public class QuantumState {
      * This method removes qubits from this {@code QuantumState} and creates new delegates for them based on their entanglement.
      * After execution, the qubits and coefficients of this {@code QuantumState} may have changed, but there will be no unentangled qubits.
      */
-    private void simplify(){
+    private synchronized void simplify(){
         List<List<Integer>> dependencies = getDependencies();
 
         if(dependencies.size() <= 1)
@@ -206,14 +204,11 @@ public class QuantumState {
     }
 
     /**
-     * TODO this is kinda fishy i dont think this works
-     *
-     *
      * @param i1 index of the first Qubit, must be former
      * @param i2 index of the second Qubit, must be latter
      * @return whether the two Qubits are entangled within the {@code QuantumState}
      */
-    private boolean areEntangled(int i1, int i2){
+    private synchronized boolean areEntangled(int i1, int i2){
         for(int x = 0; x < 1<<(qubits.length-2); x++){
             final int s = insertBit(insertBit(x,i1,false),i2,false);
             if(!state[s].multiply(state[s|(1<<i1)|(1<<i2)]).equals(
@@ -228,7 +223,7 @@ public class QuantumState {
      * all qubits would be entangled in a single group, but after a gate, this could change before simplification.
      * @return A list, with the groupings inside of them, using integers as indices to represent the qubits.
      */
-    private List<List<Integer>> getDependencies(){
+    private synchronized List<List<Integer>> getDependencies(){
         List<List<Integer>> result = new ArrayList<>();
         boolean[] placed = new boolean[qubits.length];
 
@@ -254,7 +249,7 @@ public class QuantumState {
      * @param s state mapping of qubits to basis to be tested for
      * @return the probability of finding the state {@code s} within the {@code QuantumState}
      */
-    double probabilityOf(Map<Qubit,Boolean> s){
+    synchronized double probabilityOf(Map<Qubit,Boolean> s){
         long inner = s.keySet().stream().filter(q->q.delegate==this).count();
         if(inner == 0)
             return 1;

@@ -10,14 +10,14 @@ import static quantum.QuantumGate.*;
 /**
  * Houses example static quantum subroutine methods
  */
-public class QuantumFunction{
+public class QuantumAlgorithm{
     /**
-     * Changes the state of a {@code QuantumRegister} from φ(a) to φ(a + b). The first parameter of this <em>MUST</em> have gone
+     * Changes the state of a {@code QubitRegister} from QFT(a) to QFT(a + b). The first parameter of this <em>MUST</em> have gone
      * through the QFT function beforehand, and the result will only be found by performing the inverse QFT function.
-     * @param qft a {@code QuantumRegister} for the function to be applied on, already passed through the QFT function
+     * @param qft a {@code QubitRegister} for the function to be applied on, already passed through the QFT function
      * @param b value to be added to the register
      */
-    public static void QFTADD(QuantumRegister qft, int b){
+    public static void QFTADD(QubitRegister qft, int b){
         for(int q = qft.qubits.length-1; q >= 0; q--)
             for(int i = 0; i <= q; i++)
                 if (BitUtils.bit(b,q-i))
@@ -25,14 +25,14 @@ public class QuantumFunction{
     }
 
     /**
-     * Changes the state of a {@code QuantumRegister} from φ(a) to φ(a + b) if the control Qubit is set.
+     * Changes the state of a {@code QubitRegister} from QFT(a) to QFT(a + b) if the control Qubit is set.
      * The first parameter of this <em>MUST</em> have gone through the QFT function beforehand,
      * and the result will only be found by performing the inverse QFT function.
-     * @param qft a {@code QuantumRegister} for the function to be applied on, already passed through the QFT function
+     * @param qft a {@code QubitRegister} for the function to be applied on, already passed through the QFT function
      * @param b value to be added to the register
      * @param c the control {@code Qubit}
      */
-    public static void CQFTADD(QuantumRegister qft, int b, Qubit c){
+    public static void CQFTADD(QubitRegister qft, int b, Qubit c){
         for(int q = qft.qubits.length-1; q >= 0; q--)
             for(int i = 0; i <= q; i++)
                 if (BitUtils.bit(b,q-i))
@@ -40,23 +40,23 @@ public class QuantumFunction{
     }
 
     /**
-     * the Multiplier Accumulator. Changes the state of a {@code QuantumRegister} from φ(a) to φ(a + x*y)
-     * @param qft a {@code QuantumRegister} for the function to be applied on, already passed through the QFT function
+     * the Multiplier Accumulator. Changes the state of a {@code QubitRegister} from QFT(a) to QFT(a + x*y)
+     * @param qft a {@code QubitRegister} for the function to be applied on, already passed through the QFT function
      * @param x operand to be multiplied
      * @param y multiplier constant
      */
-    public static void QFTMAC(QuantumRegister qft, QuantumRegister x, int y){
+    public static void QFTMAC(QubitRegister qft, QubitRegister x, int y){
         for(int i = 0; i < x.qubits.length; i++)
             CQFTADD(qft,y*(1<<i),x.qubits[i]);
     }
 
     /**
-     * Changes the state of a {@code QuantumRegister} from φ(a) to φ(a + b). The first parameter of this <em>MUST</em> have gone
+     * Changes the state of a {@code QubitRegister} from QFT(a) to QFT(a + b). The first parameter of this <em>MUST</em> have gone
      * through the QFT function beforehand, and the result will only be found by performing the inverse QFT function.
-     * @param qft a {@code QuantumRegister} for the function to be applied on, already passed through the QFT function
+     * @param qft a {@code QubitRegister} for the function to be applied on, already passed through the QFT function
      * @param b quantum value to be added to the register
      */
-    public static void genericQFTADD(QuantumRegister qft, QuantumRegister b){
+    public static void genericQFTADD(QubitRegister qft, QubitRegister b){
         for(int q = qft.qubits.length-1; q >= 0; q--)
             for(int i = 0; i <= q; i++)
                 if (q-i < b.qubits.length)
@@ -67,7 +67,7 @@ public class QuantumFunction{
      * Applies the Quantum Fourier Transform on a register
      * @param qr operand
      */
-    public static void QFT(QuantumRegister qr){
+    public static void QFT(QubitRegister qr){
         for(int x = 0; x < qr.qubits.length; x++){ //0..<length
             H.accept(qr.qubits[qr.qubits.length-1-x]);
             for(int y = 0; y < qr.qubits.length-1-x; y++)
@@ -80,7 +80,7 @@ public class QuantumFunction{
      * Applies the inverse Quantum Fourier Transform on a register
      * @param qr operand
      */
-    public static void inverseQFT(QuantumRegister qr) {
+    public static void inverseQFT(QubitRegister qr) {
         for(int x = 0; x < qr.qubits.length; x++){ //0..<length
             for(int y = 0; y < x; y++)
                 C(R(1+x-y)).inverse().accept(qr.qubits[qr.qubits.length-1-x],qr.qubits[qr.qubits.length-1-y]);
@@ -90,19 +90,19 @@ public class QuantumFunction{
     }
 
     /**
-     * Applies the hadamard gate on the entirety of a {@code QuantumRegister}.
+     * Applies the hadamard gate on the entirety of a {@code QubitRegister}.
      * @param qr register to apply the Hadamard gate to.
      */
-    public static void H(QuantumRegister qr){
+    public static void H(QubitRegister qr){
         for(Qubit q : qr.qubits)
             H.accept(q);
     }
 
     /**
-     * reverses the qubits of a {@code QuantumRegister} by directly reordering them.
-     * @param qr {@code QuantumRegister} to be reversed
+     * reverses the qubits of a {@code QubitRegister} by directly reordering them.
+     * @param qr {@code QubitRegister} to be reversed
      */
-    public static void reverse(QuantumRegister qr){
+    public static void reverse(QubitRegister qr){
         Qubit[] q = new Qubit[qr.qubits.length];
         System.arraycopy(qr.qubits,0,q,0,qr.qubits.length);
 
@@ -111,15 +111,15 @@ public class QuantumFunction{
     }
 
     /**
-     * Performs Grovers search algorithm. Finds a particular value of an oracle function in O(√N) evaluations
+     * Performs Grovers search algorithm. Finds a particular value of an oracle function in O(sqrt(N)) evaluations
      * @param oracle function to be searched. This oracle function should flip the polarity of whichever state is to be searched for.
      * @param length the amount of bits in the result to be searched
      * @return the value whose phase is flipped through the oracle
      */
-    public static int grovers(Consumer<QuantumRegister> oracle, int length){
-        QuantumRegister qr = new QuantumRegister(length);
+    public static int grovers(Consumer<QubitRegister> oracle, int length){
+        QubitRegister qr = new QubitRegister(length);
 
-        Consumer<QuantumRegister> nand = oracle(x->x!=0);
+        Consumer<QubitRegister> nand = oracle(x->x!=0);
 
         H(qr);
         for(int invocations = 0; invocations < Math.PI*0.25*Math.sqrt(1<<length)+1; invocations++){
@@ -136,11 +136,11 @@ public class QuantumFunction{
      * Determines whether a predicate function is constant or balanced. The function should flip the phase of any "true" values and leave
      * others alone.
      * @param oracle predicate function
-     * @param length length of {@code QuantumRegister} this function should operate on
+     * @param length length of {@code QubitRegister} this function should operate on
      * @return evaluates to {@code true} if constant, and {@code false} if balanced
      */
-    public static boolean deutschJozsa(Consumer<QuantumRegister> oracle, int length){
-        QuantumRegister qr = new QuantumRegister(length);
+    public static boolean deutschJozsa(Consumer<QubitRegister> oracle, int length){
+        QubitRegister qr = new QubitRegister(length);
 
         H(qr);
         oracle.accept(qr);
@@ -154,7 +154,7 @@ public class QuantumFunction{
      * @param function predicate to determine which basis state coefficients are phase-flipped
      * @return a quantum oracle function representation of the predicate given
      */
-    public static Consumer<QuantumRegister> oracle(Predicate<Integer> function){
+    public static Consumer<QubitRegister> oracle(Predicate<Integer> function){
         return qr->{
             Complex[][] matrix = new Complex[1 << qr.qubits.length][1 << qr.qubits.length];
 
@@ -181,7 +181,7 @@ public class QuantumFunction{
      * @param function The function to be mapped into a quantum function
      * @return the quantum function created
      */
-    public static BiConsumer<QuantumRegister, QuantumRegister> quantumFunction(UnaryOperator<Integer> function){
+    public static BiConsumer<QubitRegister, QubitRegister> quantumFunction(UnaryOperator<Integer> function){
         //this assumes that the first qubits in the gate are least significant. This assumption may need to be reversed
 
         return (input, output)->{
@@ -212,11 +212,11 @@ public class QuantumFunction{
      * @param oracle function that takes in two registers. This function changes the value of the second to the output of a function with the first.
      * @param inputLength length of the input register of the function
      * @param outputLength length of the output register of the function
-     * @return a {@code QuantumRegister} with higher probability to evaluate to the period of the function
+     * @return a {@code QubitRegister} with higher probability to evaluate to the period of the function
      */
-    public static QuantumRegister periodFinder(BiConsumer<QuantumRegister,QuantumRegister> oracle, int inputLength, int outputLength){
-        QuantumRegister input = new QuantumRegister(inputLength);
-        QuantumRegister output = new QuantumRegister(outputLength);
+    public static QubitRegister periodFinder(BiConsumer<QubitRegister,QubitRegister> oracle, int inputLength, int outputLength){
+        QubitRegister input = new QubitRegister(inputLength);
+        QubitRegister output = new QubitRegister(outputLength);
         H(input);
         oracle.accept(input,output);
         inverseQFT(input);
@@ -250,7 +250,7 @@ public class QuantumFunction{
         int n = log2(N);
         int q = log2(N*N);
         int Q = 1<<q;
-        QuantumRegister qr = periodFinder(quantumFunction(x -> ((int) Math.pow(a, x)) % N), q, n);
+        QubitRegister qr = periodFinder(quantumFunction(x -> ((int) Math.pow(a, x)) % N), q, n);
         while(true) {
             evaluations++;
             int y = qr.sample();
@@ -319,8 +319,8 @@ public class QuantumFunction{
      */
     public static void main(String[] args){
         long t = System.currentTimeMillis();
-        QuantumRegister a = new QuantumRegister(3,5);
-        QuantumRegister b = new QuantumRegister(3,5);
+        QubitRegister a = new QubitRegister(5,3);
+        QubitRegister b = new QubitRegister(5,3);
 
         QFT(a);
         QFTMAC(a,b,3);
@@ -334,28 +334,4 @@ public class QuantumFunction{
         else
             System.out.println("a = " + a0 + ", b = " + b0 + " :(");
     }
-
-    /*
-     * TODO UNTESTED
-     * Estimates the quantum phase of a quantum gate. This gate must have successive powers of (2^k) easily defined.
-     * @param oracle a function providing U^(2^k) where k is the parameter of the function, and U is the original gate to be tested
-     * @param length length of QuantumRegister to be put through the gate.
-     * @param precision bit precision for the phase to be measured
-     * @return a QuantumRegister TODO most likely to be the quantum phase?
-
-    public static QuantumRegister quantumPhaseEstimation(Function<Integer,QuantumGate> oracle, int length, int precision){
-        QuantumRegister n = new QuantumRegister(precision);
-        QuantumRegister m = new QuantumRegister(length);
-        H(n);
-        for(int x = 0; x < precision; x++){
-            Qubit[] qubits = new Qubit[m.qubits.length+1];
-            System.arraycopy(m.qubits,0,qubits,0,m.qubits.length);
-            qubits[qubits.length-1] = n.qubits[n.qubits.length-x-1]; //I think it goes from the end. Don't quote me on this.
-
-            C(oracle.apply(x)).accept(qubits);
-        }
-        inverseQFT(n);
-
-        return n;
-    }*/
 }

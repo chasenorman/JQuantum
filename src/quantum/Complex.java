@@ -3,24 +3,24 @@ package quantum;
 /**
  * The {@code Complex} class represents a complex number with a magnitude and a phase.
  */
-public class Complex {
+class Complex {
     /** a constant with the {@code Complex} equivalent of the number 0*/
-    public static final Complex ZERO = new Complex(0);
+    static final Complex ZERO = new Complex(0);
     /** a constant with the {@code Complex} equivalent of the number 1*/
-    public static final Complex ONE = new Complex(1);
+    static final Complex ONE = new Complex(1);
     /** a constant for which calculations should be done within the precision of*/
-    public static final double DELTA = 1e-10;
+    static final double DELTA = 1e-16;
     /** magnitude (radius) of the {@code Complex}*/
-    public final double r;
+    final double r;
     /** phase value of the {@code Complex}, in radians*/
-    public final double theta;
+    final double theta;
 
     /**
      * Creates a complex number with a given real part, and no imaginary part. This number will have a phase of 0.
      *
      * @param r a {@code double} for the real part of a complex number
      */
-    public Complex(double r){
+    Complex(double r){
         this(r, 0);
     }
 
@@ -30,7 +30,7 @@ public class Complex {
      * @param r magnitude of the complex number to be created
      * @param theta phase of the complex number to be created
      */
-    public Complex(double r, double theta){
+    Complex(double r, double theta){
         if(r < 0) {
             theta += Math.PI;
             r = -r;
@@ -46,7 +46,7 @@ public class Complex {
      * @param o the second operand
      * @return the product of the two complex numbers
      */
-    public Complex multiply(Complex o){
+    Complex multiply(Complex o){
         return new Complex(r*o.r,theta+o.theta);
     }
 
@@ -55,7 +55,7 @@ public class Complex {
      * @param given an array of complex numbers to be summed
      * @return the sum total as a complex number
      */
-    public static Complex sum(Complex[] given){
+    static Complex sum(Complex[] given){
         double a = 0;
         double b = 0;
         for(Complex c : given){
@@ -70,7 +70,7 @@ public class Complex {
      * @param scalar value for which the vector is to be multiplied
      * @return a scaled vector by a factor of {@code scalar}
      */
-    public Complex multiply(double scalar){
+    Complex multiply(double scalar){
         return new Complex(scalar*r,theta);
     }
 
@@ -78,7 +78,7 @@ public class Complex {
      * Performs the absolute square operaion, which is equivalent to the square of the magnitude, and is a real number.
      * @return the absolute square of the complex number, as a {@code double}
      */
-    public double absoluteSquare(){
+    double absoluteSquare(){
         return r*r;
     }
 
@@ -86,8 +86,8 @@ public class Complex {
      * Creates a new complex number that is the complex conjugate. This has the same real part but a negated imaginary part.
      * @return the complex conjugate of {@code this}
      */
-    public Complex conjugate(){
-        return new Complex(r,Math.PI-theta);
+    Complex conjugate(){
+        return new Complex(r,-theta);
     }
 
     /**

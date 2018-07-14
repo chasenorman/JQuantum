@@ -3,7 +3,7 @@ package quantum;
 import java.util.function.Predicate;
 
 /**
- * The BitUtils class houses commonly used methods that involve the bits of an {@code int}
+ * The {@code BitUtils} class houses commonly used methods that involve the bits of an {@code int}
  */
 public class BitUtils {
     /**
@@ -53,7 +53,7 @@ public class BitUtils {
     }
 
     /**
-     * Creates a binary string representation of a {@code boolean[]}. Ex: [true, true, false] -> 3 -> "011"
+     * Creates a binary string representation of a {@code boolean[]}. Ex: [true, true, false] -&gt; 3 -&gt; "011"
      * @param given the bits of the binary value, starting with the least significant bit
      * @return The binary {@code String}, starting with the most significant bit
      */

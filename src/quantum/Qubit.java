@@ -10,14 +10,14 @@ public class Qubit{
     int index = 0;
 
     /**
-     * Creates a qubit with the state |0⟩
+     * Creates a qubit with the state |0&gt;
      */
     public Qubit(){
         this(false);
     }
 
     /**
-     * Creates a qubit with the basis state |0⟩ or |1⟩
+     * Creates a qubit with the basis state |0&gt; or |1&gt;
      * @param b basis state of the {@code Qubit}
      */
     public Qubit(boolean b){
@@ -25,7 +25,7 @@ public class Qubit{
     }
 
     /**
-     * Collapses this Qubit to either |0⟩ or |1⟩
+     * Collapses this Qubit to either |0&gt; or |1&gt;
      * @return the result of this collapse
      */
     public boolean measure(){
@@ -41,7 +41,7 @@ public class Qubit{
     }
 
     /**
-     * Creates a {@code String} representation of this {@code Qubit} with the probability of |0⟩ and |1⟩
+     * Creates a {@code String} representation of this {@code Qubit} with the probability of |0&gt; and |1&gt;
      * @return A {@code String} representation of this {@code Qubit}
      */
     public String toString(){

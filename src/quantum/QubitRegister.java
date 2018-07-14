@@ -8,18 +8,18 @@ import java.util.Set;
 import static quantum.BitUtils.*;
 
 /**
- * The {@code QuantumRegister} represents a set of Qubits that can be operated on as a group.
+ * The {@code QubitRegister} class represents a set of Qubits that can be operated on as a group.
  */
-public class QuantumRegister{
+public class QubitRegister{
 
     /**the qubits contained in this register*/
     public final Qubit[] qubits;
 
     /**
-     * Creates a new register with the |0⟩⊗n basis state
+     * Creates a new register with the |0&gt;*n basis state
      * @param length size of the new register to be created, in Qubits
      */
-    public QuantumRegister(int length){
+    public QubitRegister(int length){
         qubits = new Qubit[length];
         for(int x = 0; x < length; x++)
             qubits[x] = new Qubit();
@@ -30,7 +30,7 @@ public class QuantumRegister{
      * @param value basis state value to be stored in the bits of the register
      * @param length amount of qubits to be in the register
      */
-    public QuantumRegister(int value, int length){
+    public QubitRegister(int length, int value){
         qubits = new Qubit[length];
         for(int x = 0; x < length; x++)
             qubits[x] = new Qubit(BitUtils.bit(value,x));
@@ -60,7 +60,7 @@ public class QuantumRegister{
     }
 
     /**
-     * Creates a {@code String} representation of this {@code QuantumRegister} including all possible states and their respective probabilities.
+     * Creates a {@code String} representation of this {@code QubitRegister} including all possible states and their respective probabilities.
      * These probabilities will add to one, and will be separated by lines.
      * @return a {@code String} of the probabilities of each possible basis state.
      */
@@ -76,9 +76,9 @@ public class QuantumRegister{
     }
 
     /**
-     * Finds the probability that when measured or sampled, this {@code QuantumRegister} will represent a given basis state.
+     * Finds the probability that when measured or sampled, this {@code QubitRegister} will represent a given basis state.
      * This is represented as a {@code double} value on [0,1]. The probabilities of all basis states added together will be 1.
-     * This method will only test the bits that are within the {@code QuantumRegister}, and as such it will act as a periodic function
+     * This method will only test the bits that are within the {@code QubitRegister}, and as such it will act as a periodic function
      * @param state the basis state to be tested for
      * @return the probability of the basis state being the measured value
      */
@@ -95,7 +95,7 @@ public class QuantumRegister{
 
     /**
      * Tests entanglement with a {@code Qubit}
-     * @param other the {@code Qubit} to be tested for entanglement with this {@code QuantumRegister}
+     * @param other the {@code Qubit} to be tested for entanglement with this {@code QubitRegister}
      * @return whether or not they are entangled, as a {@code boolean}
      */
     public boolean isEntangledWith(Qubit other){
@@ -103,8 +103,8 @@ public class QuantumRegister{
     }
 
     /**
-     * Creates a {@code Set} of all of the {@code QuantumStates} used by the qubits of this {@code QuantumRegister}
-     * @return a set of all delegates in this {@code QuantumRegister}
+     * Creates a {@code Set} of all of the {@code QuantumStates} used by the qubits of this {@code QubitRegister}
+     * @return a set of all delegates in this {@code QubitRegister}
      */
     Set<QuantumState> delegates(){
         Set<QuantumState> quantumStates = new HashSet<>();
